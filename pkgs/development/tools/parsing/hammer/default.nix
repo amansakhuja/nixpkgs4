@@ -28,6 +28,6 @@ stdenv.mkDerivation {
     '';
     homepage = "https://github.com/UpstandingHackers/hammer";
     license = licenses.gpl2;
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }
