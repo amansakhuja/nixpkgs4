@@ -63,8 +63,10 @@ rustPlatform.buildRustPackage.override {
   # changes hash of vendor directory otherwise
   dontUpdateAutotoolsGnuConfigScripts = true;
 
+  depsBuildBuild = [ pkg-config ];
+
   nativeBuildInputs = [
-    pkg-config cmake installShellFiles makeWrapper
+    pkg-config cmake installShellFiles makeWrapper zlib
     (lib.getDev pkgsHostHost.curl)
     zlib
   ];
@@ -87,6 +89,12 @@ rustPlatform.buildRustPackage.override {
       src/tools/cargo/src/etc/cargo.bashcomp.sh
 
     installShellCompletion --zsh src/tools/cargo/src/etc/_cargo
+  '' + lib.optionalString (!stdenv.hostPlatform.isStatic &&
+    stdenv.hostPlatform.parsed.kernel.execFormat == lib.systems.parse.execFormats.elf) ''
+    # Check that it didn't build its own static libcurl.  This isn't an
+    # installCheck because it should be run even when cross compiling.
+    echo Checking libcurl is dynamically linked...
+    $READELF -a $out/bin/.cargo-wrapped | grep -F 'Shared library: [libcurl.so'
   '';
 
   checkPhase = ''
@@ -97,14 +105,6 @@ rustPlatform.buildRustPackage.override {
 
   # Disable check phase as there are failures (4 tests fail)
   doCheck = false;
-
-  doInstallCheck = !stdenv.hostPlatform.isStatic &&
-    stdenv.hostPlatform.parsed.kernel.execFormat == lib.systems.parse.execFormats.elf;
-  installCheckPhase = ''
-    runHook preInstallCheck
-    readelf -a $out/bin/.cargo-wrapped | grep -F 'Shared library: [libcurl.so'
-    runHook postInstallCheck
-  '';
 
   meta = with lib; {
     homepage = "https://crates.io";

@@ -3,6 +3,7 @@
 
 { stdenvNoCC
 , lib
+, rust
 , buildPackages
 , pkg-config
 , baseBinName ? "pkg-config"
@@ -114,6 +115,7 @@ stdenv.mkDerivation {
 
   env = {
     shell = getBin stdenvNoCC.shell + stdenvNoCC.shell.shellPath or "";
+    rustTarget = replaceStrings ["-"] ["_"] (rust.toRustTarget targetPlatform);
     wrapperName = "PKG_CONFIG_WRAPPER";
     inherit targetPrefix suffixSalt baseBinName;
   };
