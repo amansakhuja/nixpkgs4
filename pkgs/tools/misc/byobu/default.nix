@@ -43,13 +43,20 @@ stdenv.mkDerivation rec {
     cp --remove-destination $out/bin/byobu $out/bin/byobu-tmux
 
     for i in $out/bin/byobu*; do
+      # Don't wrap byobu-launch.
+      # See: https://github.com/NixOS/nixpkgs/issues/131353
+      if [ "$(basename $i)" == "byobu-launch" ];
+      then
+        continue
+      fi
+
       # We don't use the usual ".$package-wrapped" because arg0 within the shebang scripts
       # points to the filename and byobu matches against this to know which backend
       # to start with
       file=".$(basename $i)"
       mv $i $out/bin/$file
       makeWrapper "$out/bin/$file" "$out/bin/$(basename $i)" --argv0 $(basename $i) \
-        --set BYOBU_PATH ${lib.escapeShellArg (lib.makeBinPath [ vim bc ])} \
+        --set BYOBU_PREFIX "$out" \
         --set BYOBU_PYTHON "${pythonEnv}/bin/python"
     done
   '';
