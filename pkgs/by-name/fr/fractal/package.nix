@@ -26,7 +26,7 @@
   glycin-loaders,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "fractal";
   version = "9";
 
@@ -34,25 +34,14 @@ stdenv.mkDerivation rec {
     domain = "gitlab.gnome.org";
     owner = "World";
     repo = "fractal";
-    rev = "refs/tags/${version}";
+    rev = "refs/tags/${finalAttrs.version}";
     hash = "sha256-3UI727LUYw7wUKbGRCtgpkF9NNw4XuZ3tl3KV3Ku9r4=";
   };
 
-  cargoDeps = rustPlatform.importCargoLock {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "matrix-sdk-0.7.1" = "sha256-AmODDuNLpI6gXuu+oPl3MqcOnywqR8lqJ0bVOIiz02E=";
-      "ruma-0.10.1" = "sha256-6U2LKMYyY7SLOh2jJcVuDBsfcidNoia1XU+JsmhMHGY=";
-    };
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit (finalAttrs) pname version src;
+    hash = "sha256-Kec31bted9qdwSzvx6UsYybavdRaNtk1tvg67xadpjQ=";
   };
-
-  # Dirty approach to add patches after cargoSetupPostUnpackHook
-  # We should eventually use a cargo vendor patch hook instead
-  preConfigure = ''
-    pushd ../$(stripHash $cargoDeps)/glycin-2.*
-      patch -p3 < ${glycin-loaders.passthru.glycinPathsPatch}
-    popd
-  '';
 
   nativeBuildInputs = [
     glib
@@ -67,6 +56,7 @@ stdenv.mkDerivation rec {
     desktop-file-utils
     appstream-glib
     wrapGAppsHook4
+    glycin-loaders.patchHook
   ];
 
   buildInputs =
@@ -89,23 +79,17 @@ stdenv.mkDerivation rec {
       gst-plugins-good
     ]);
 
-  preFixup = ''
-    gappsWrapperArgs+=(
-      --prefix XDG_DATA_DIRS : "${glycin-loaders}/share"
-    )
-  '';
-
   passthru = {
     updateScript = nix-update-script { };
   };
 
-  meta = with lib; {
+  meta = {
     description = "Matrix group messaging app";
     homepage = "https://gitlab.gnome.org/GNOME/fractal";
-    changelog = "https://gitlab.gnome.org/World/fractal/-/releases/${version}";
-    license = licenses.gpl3Plus;
-    maintainers = teams.gnome.members;
-    platforms = platforms.linux;
+    changelog = "https://gitlab.gnome.org/World/fractal/-/releases/${finalAttrs.version}";
+    license = lib.licenses.gpl3Plus;
+    maintainers = lib.teams.gnome.members;
+    platforms = lib.platforms.linux;
     mainProgram = "fractal";
   };
-}
+})

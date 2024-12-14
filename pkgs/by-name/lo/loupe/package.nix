@@ -30,11 +30,6 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-bgRu/k965X7idI1S0dBzVsdEnSBKPTHQtCNnqAGXShU=";
   };
 
-  patches = [
-    # Fix paths in glycin library
-    glycin-loaders.passthru.glycinPathsPatch
-  ];
-
   nativeBuildInputs = [
     cargo
     desktop-file-utils
@@ -46,6 +41,7 @@ stdenv.mkDerivation (finalAttrs: {
     moreutils
     rustc
     wrapGAppsHook4
+    glycin-loaders.patchHook
   ];
 
   buildInputs = [
@@ -56,34 +52,17 @@ stdenv.mkDerivation (finalAttrs: {
     libseccomp
   ];
 
-  postPatch = ''
-    # Replace hash of file we patch in vendored glycin.
-    jq \
-      --arg hash "$(sha256sum vendor/glycin/src/sandbox.rs | cut -d' ' -f 1)" \
-      '.files."src/sandbox.rs" = $hash' \
-      vendor/glycin/.cargo-checksum.json \
-      | sponge vendor/glycin/.cargo-checksum.json
-  '';
-
-  preFixup = ''
-    # Needed for the glycin crate to find loaders.
-    # https://gitlab.gnome.org/sophie-h/glycin/-/blob/0.1.beta.2/glycin/src/config.rs#L44
-    gappsWrapperArgs+=(
-      --prefix XDG_DATA_DIRS : "${glycin-loaders}/share"
-    )
-  '';
-
   passthru.updateScript = gnome.updateScript {
     packageName = "loupe";
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://gitlab.gnome.org/GNOME/loupe";
     changelog = "https://gitlab.gnome.org/GNOME/loupe/-/blob/${finalAttrs.version}/NEWS?ref_type=tags";
     description = "Simple image viewer application written with GTK4 and Rust";
-    license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ jk ] ++ teams.gnome.members;
-    platforms = platforms.unix;
+    license = lib.licenses.gpl3Plus;
+    maintainers = with lib.maintainers; [ jk ] ++ lib.teams.gnome.members;
+    platforms = lib.platforms.unix;
     mainProgram = "loupe";
   };
 })
