@@ -95,7 +95,12 @@ let
     "wheel"
   ];
 
-  cleanAttrs = lib.flip removeAttrs [
+in
+
+lib.extendMkDerivation {
+  constructDrv = stdenv.mkDerivation;
+
+  excludeDrvArgNames = [
     "disabled"
     "checkPhase"
     "checkInputs"
@@ -119,8 +124,8 @@ let
     "build-system"
   ];
 
-in
-
+  extendDrvArgs =
+    finalAttrs:
 {
   name ? "${attrs.pname}-${attrs.version}",
 
@@ -206,10 +211,6 @@ in
   ...
 }@attrs:
 
-let
-  # Keep extra attributes from `attrs`, e.g., `patchPhase', etc.
-  self = stdenv.mkDerivation (
-    finalAttrs:
     let
       format' =
         assert (pyproject != null) -> (format == null);
@@ -276,8 +277,7 @@ let
       isSetuptoolsDependency = isSetuptoolsDependency' (attrs.pname or null);
 
     in
-    (cleanAttrs attrs)
-    // {
+    {
 
       name = namePrefix + name;
 
@@ -453,17 +453,12 @@ let
       // optionalAttrs (attrs ? unittestFlagsArray) {
         unittestFlagsArray = attrs.unittestFlagsArray;
       }
-    )
-  );
+    );
 
-  # This derivation transformation function must be independent to `attrs`
-  # for fixed-point arguments support in the future.
   transformDrv =
     drv:
     extendDerivation (
       drv.disabled
       -> throw "${lib.removePrefix namePrefix drv.name} not supported for interpreter ${python.executable}"
     ) { } (toPythonModule drv);
-
-in
-transformDrv self
+}
