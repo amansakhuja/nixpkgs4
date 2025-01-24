@@ -25,16 +25,22 @@ let
     mirrorArgs (
       origArgs:
       let
-        args = lib.fix (
-          lib.extends (_: previousAttrs: {
-            passthru = (previousAttrs.passthru or { }) // {
-              inherit overridePythonAttrs;
-            };
-          }) (_: origArgs)
-        );
-        result = f args;
+        # Ensure overrideStdenvCompat would work as expected
+        optionalFix = if lib.isFunction origArgs then lib.id else lib.fix;
 
-        overrideWith = newArgs: args // lib.toFunction newArgs args;
+        unfixedArgs = lib.extends (_: previousAttrs: {
+          passthru = (previousAttrs.passthru or { }) // {
+            inherit overridePythonAttrs;
+          };
+        }) (lib.toFunction origArgs);
+        result = f (optionalFix unfixedArgs);
+
+        # Refrain from providing the (finalAttrs: previousPythonAttrs; { ... }) overriding functionality
+        # by deliberately using (_: lib.toFunction newArgs) instead of (lib.toExtension newArgs)
+        # to ensure overrideStdenvCompat work as expected
+        # and to encourage transition from overridePythonAttrs to overrideAttrs
+        overrideWith = newArgs: optionalFix (lib.extends (_: lib.toFunction newArgs) unfixedArgs);
+
         overridePythonAttrs = mirrorArgs (newArgs: makeOverridablePythonPackage f (overrideWith newArgs));
 
         # Change the result of the function call by applying g to it
