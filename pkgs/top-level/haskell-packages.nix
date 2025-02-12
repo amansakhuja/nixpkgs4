@@ -116,20 +116,6 @@ in
         llvmPackages = pkgs.llvmPackages_12;
       };
       ghc810 = compiler.ghc8107;
-      ghc902 = callPackage ../development/compilers/ghc/9.0.2.nix {
-        bootPkgs =
-          # the oldest ghc with aarch64-darwin support is 8.10.5
-          if stdenv.buildPlatform.isPower64 && stdenv.buildPlatform.isLittleEndian then
-            bb.packages.ghc810
-          else
-            bb.packages.ghc8107Binary;
-        inherit (buildPackages.python311Packages) sphinx; # a distutils issue with 3.12
-        python3 = buildPackages.python311; # so that we don't have two of them
-        inherit (buildPackages.darwin) autoSignDarwinBinariesHook xattr;
-        buildTargetLlvmPackages = pkgsBuildTarget.llvmPackages_12;
-        llvmPackages = pkgs.llvmPackages_12;
-      };
-      ghc90 = compiler.ghc902;
       ghc925 = callPackage ../development/compilers/ghc/9.2.5.nix {
         bootPkgs =
           if stdenv.buildPlatform.isPower64 && stdenv.buildPlatform.isLittleEndian then
@@ -199,11 +185,10 @@ in
 
           # On ARM text won't build with GHC 8.10.*
           if stdenv.buildPlatform.isAarch then
-            # TODO(@sternenseemann): package bindist
-            bb.packages.ghc902
+            bb.packages.ghc8107
           # No suitable bindists for powerpc64le
           else if stdenv.buildPlatform.isPower64 && stdenv.buildPlatform.isLittleEndian then
-            bb.packages.ghc902
+            bb.packages.ghc8107
           else
             bb.packages.ghc8107Binary;
         inherit (buildPackages.python3Packages) sphinx;
@@ -223,11 +208,10 @@ in
 
           # On ARM text won't build with GHC 8.10.*
           if stdenv.buildPlatform.isAarch then
-            # TODO(@sternenseemann): package bindist
-            bb.packages.ghc902
+            bb.packages.ghc8107
           # No suitable bindists for powerpc64le
           else if stdenv.buildPlatform.isPower64 && stdenv.buildPlatform.isLittleEndian then
-            bb.packages.ghc902
+            bb.packages.ghc8107
           else
             bb.packages.ghc8107Binary;
         inherit (buildPackages.python3Packages) sphinx;
@@ -516,12 +500,6 @@ in
         compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-8.10.x.nix { };
       };
       ghc810 = packages.ghc8107;
-      ghc902 = callPackage ../development/haskell-modules {
-        buildHaskellPackages = bh.packages.ghc902;
-        ghc = bh.compiler.ghc902;
-        compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-9.0.x.nix { };
-      };
-      ghc90 = packages.ghc902;
       ghc925 = callPackage ../development/haskell-modules {
         buildHaskellPackages = bh.packages.ghc925;
         ghc = bh.compiler.ghc925;

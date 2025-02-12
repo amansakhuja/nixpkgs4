@@ -330,8 +330,6 @@ let
       # Build selected packages (HLS) for multiple Haskell compilers to rebuild
       # the cache after a staging merge
       haskell.packages = genAttrs [
-        # TODO: share this list between release.nix and release-haskell.nix
-        "ghc90"
         "ghc92"
         "ghc94"
         "ghc96"
