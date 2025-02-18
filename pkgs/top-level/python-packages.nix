@@ -3398,9 +3398,6 @@ self: super: with self; {
 
   distutils-extra = callPackage ../development/python-modules/distutils-extra { };
 
-  # LTS in extended support phase
-  django_3 = callPackage ../development/python-modules/django/3.nix { };
-
   # LTS with mainsteam support
   django = self.django_4;
   django_4 = callPackage ../development/python-modules/django/4.nix { };
