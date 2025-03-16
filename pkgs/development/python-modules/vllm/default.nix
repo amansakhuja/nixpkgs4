@@ -65,7 +65,7 @@
   rocmSupport ? config.rocmSupport,
   rocmPackages ? { },
   gpuTargets ? [ ],
-}@args:
+}:
 
 let
   inherit (lib)
@@ -195,12 +195,13 @@ let
 
 in
 
-buildPythonPackage rec {
+let
+  stdenv' = if cudaSupport then cudaPackages.backendStdenv else stdenv;
+in
+buildPythonPackage.override { stdenv = stdenv'; } rec {
   pname = "vllm";
   version = "0.7.3";
   pyproject = true;
-
-  stdenv = if cudaSupport then cudaPackages.backendStdenv else args.stdenv;
 
   src = fetchFromGitHub {
     owner = "vllm-project";
