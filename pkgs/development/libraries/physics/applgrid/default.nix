@@ -5,7 +5,7 @@
   gfortran,
   hoppet,
   lhapdf,
-  root5,
+  root,
   zlib,
   Cocoa,
 }:
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     hoppet
     lhapdf
-    root5
+    root
     zlib
   ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ Cocoa ];
 
