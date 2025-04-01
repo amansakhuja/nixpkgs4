@@ -6,6 +6,7 @@
   perl,
   git,
   versionCheckHook,
+  nixosTests,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "spacetimedb";
@@ -46,6 +47,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
   postInstall = ''
     mv $out/bin/spacetimedb-cli $out/bin/spacetime
   '';
+
+  passthru.tests = {
+    inherit (nixosTests) spacetimedb;
+  };
 
   meta = {
     description = "Full-featured relational database system that lets you run your application logic inside the database";

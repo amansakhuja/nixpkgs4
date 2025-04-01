@@ -1099,6 +1099,7 @@ in {
   sonic-server = handleTest ./sonic-server.nix {};
   sourcehut = handleTest ./sourcehut {};
   spacecookie = handleTest ./spacecookie.nix {};
+  spacetimedb = handleTest ./spacetimedb.nix {};
   spark = handleTestOn [ "x86_64-linux" "aarch64-linux" ] ./spark {};
   spiped = runTest ./spiped.nix;
   sqlite3-to-mysql = handleTest ./sqlite3-to-mysql.nix {};
