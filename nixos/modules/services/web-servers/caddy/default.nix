@@ -53,15 +53,20 @@ let
           ${concatMapStringsSep "\n" mkVHostConf virtualHosts}
         '';
 
-        Caddyfile-formatted = pkgs.runCommand "Caddyfile-formatted" { } ''
-          mkdir -p $out
-          cp --no-preserve=mode ${Caddyfile}/Caddyfile $out/Caddyfile
-          ${lib.getExe cfg.package} fmt --overwrite $out/Caddyfile
-        '';
+        Caddyfile-formatted =
+          pkgs.runCommand "Caddyfile-formatted" { nativeBuildInputs = [ cfg.package ]; }
+            ''
+              mkdir -p $out
+              cp --no-preserve=mode ${Caddyfile}/Caddyfile $out/Caddyfile
+              caddy fmt --overwrite $out/Caddyfile
+              ${lib.optionalString cfg.validateConfigFile ''
+                # 'validate' cannot be used for validation, due to log location access
+                # See https://github.com/caddyserver/caddy/issues/6788
+                caddy adapt --adapter caddyfile --config $out/Caddyfile
+              ''}
+            '';
       in
-      "${
-        if pkgs.stdenv.buildPlatform == pkgs.stdenv.hostPlatform then Caddyfile-formatted else Caddyfile
-      }/Caddyfile";
+      "${Caddyfile-formatted}/Caddyfile";
 
   etcConfigFile = "caddy/caddy_config";
 
@@ -374,6 +379,15 @@ in
 
         Find more examples
         [here](https://caddyserver.com/docs/caddyfile/concepts#environment-variables)
+      '';
+    };
+
+    validateConfigFile = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Enforce Caddy configuration validation during build.
+        Will not work if you provide your own configuration via `services.caddy.configFile` or use `services.caddy.settings`.
       '';
     };
   };
