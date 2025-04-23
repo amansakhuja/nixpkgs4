@@ -22,15 +22,12 @@
   libXcursor,
   libXft,
   libXrender,
-  ApplicationServices,
-  Carbon,
-  Cocoa,
+  darwin,
 
   withGL ? true,
   libGL,
   libGLU,
   glew,
-  OpenGL,
 
   withCairo ? true,
   cairo,
@@ -84,8 +81,8 @@ stdenv.mkDerivation {
 
   buildInputs =
     lib.optionals stdenv.hostPlatform.isDarwin [
-      ApplicationServices
-      Carbon
+      darwin.apple_sdk.frameworks.ApplicationServices
+      darwin.apple_sdk.frameworks.Carbon
     ]
     ++ lib.optionals (withGL && !stdenv.hostPlatform.isDarwin) [
       libGL
@@ -115,10 +112,10 @@ stdenv.mkDerivation {
       libXrender
     ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      Cocoa
+      darwin.apple_sdk.frameworks.Cocoa
     ]
     ++ lib.optionals (withGL && stdenv.hostPlatform.isDarwin) [
-      OpenGL
+      darwin.apple_sdk.frameworks.OpenGL
     ]
     ++ lib.optionals withCairo [
       cairo

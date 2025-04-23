@@ -9247,22 +9247,8 @@ with pkgs;
 
   flint3 = callPackage ../development/libraries/flint/3.nix { };
 
-  fltk13 = callPackage ../development/libraries/fltk {
-    inherit (darwin.apple_sdk.frameworks)
-      ApplicationServices
-      Carbon
-      Cocoa
-      OpenGL
-      ;
-  };
-  fltk14 = callPackage ../development/libraries/fltk/1.4.nix {
-    inherit (darwin.apple_sdk.frameworks)
-      ApplicationServices
-      Carbon
-      Cocoa
-      OpenGL
-      ;
-  };
+  fltk13 = callPackage ../development/libraries/fltk { };
+  fltk14 = callPackage ../development/libraries/fltk/1.4.nix { };
   fltk13-minimal = fltk13.override {
     withGL = false;
     withCairo = false;
