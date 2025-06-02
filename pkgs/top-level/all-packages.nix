@@ -11390,6 +11390,8 @@ with pkgs;
 
   sass = callPackage ../development/tools/sass { };
 
+  buildSddmThemePackage = callPackage ../build-support/build-sddm-theme.nix { };
+
   sddm-astronaut = qt6Packages.callPackage ../data/themes/sddm-astronaut { };
 
   sddm-chili-theme = libsForQt5.callPackage ../data/themes/chili-sddm { };
