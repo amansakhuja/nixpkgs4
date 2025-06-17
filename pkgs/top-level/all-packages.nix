@@ -3629,7 +3629,7 @@ with pkgs;
 
   denoHooks = callPackage ../build-support/deno/build-deno-package/hooks { };
 
-  kcollectd = libsForQt5.callPackage ../tools/misc/kcollectd { };
+  kcollectd = kdePackages.callPackage ../tools/misc/kcollectd { };
 
   ktailctl = kdePackages.callPackage ../applications/networking/ktailctl { };
 
