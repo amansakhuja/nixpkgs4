@@ -119,7 +119,12 @@ import ../../make-test-python.nix (
         };
 
       server =
-        { config, pkgs, ... }:
+        {
+          nodes,
+          config,
+          pkgs,
+          ...
+        }:
         {
           virtualisation.memorySize = 2048;
 
@@ -145,6 +150,9 @@ import ../../make-test-python.nix (
               config.services.mastodon.sidekiqPort
             ];
           };
+
+          # We need this for the mastodon-init-db.service
+          services.postgresql.package = nodes.databases.services.postgresql.package;
 
           services.mastodon = {
             enable = true;
