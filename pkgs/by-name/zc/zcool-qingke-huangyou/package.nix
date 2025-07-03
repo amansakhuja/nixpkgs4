@@ -16,12 +16,9 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     hash = "sha256-xIIDP8gCtwNtY6AReeuLZSbnDXczS5ycObP3EKxk+hU=";
   };
 
-  dontUnpack = true;
-
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/share/fonts/truetype/
-    install -m644 $src/fonts/*.ttf $out/share/fonts/truetype/
+    install -Dm644 fonts/*.ttf -t $out/share/fonts/truetype/
     runHook postInstall
   '';
 
