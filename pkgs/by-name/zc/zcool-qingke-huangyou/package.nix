@@ -11,7 +11,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   src = fetchFromGitHub {
     owner = "googlefonts";
-    repo = finalAttrs.pname;
+    repo = "zcool-qingke-huangyou";
     rev = "c9dac424b0a9f47d3b113cff4a4922f632d82c94";
     hash = "sha256-xIIDP8gCtwNtY6AReeuLZSbnDXczS5ycObP3EKxk+hU=";
   };
