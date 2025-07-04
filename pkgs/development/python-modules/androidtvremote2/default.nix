@@ -39,7 +39,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library to interact with the Android TV Remote protocol v2";
     homepage = "https://github.com/tronikos/androidtvremote2";
-    changelog = "https://github.com/tronikos/androidtvremote2/releases/tag/v${version}";
+    changelog = "https://github.com/tronikos/androidtvremote2/releases/tag/${src.tag}";
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];
   };
